@@ -364,8 +364,84 @@ Commit `adcf612`, subido. Llevo **4 commits de los 10**.
 
 ---
 
-## Lo que viene después (semana 1)
+## Paso 14 · Los documentos entran en el repo (1 nov)
 
-- Conectar OpenCode a los modelos del centro (URL y clave del profesor, en variables de entorno)
-- `opencode.json` y `AGENTS.md`
-- Órdenes `--help`, `version` y `listar`
+**Qué quería:** que `docs/prompts.md` (lo pide el profesor) y este diario viajen con el repo.
+
+**Qué hice:** descargué los dos ficheros, creé la carpeta `docs` y los moví ahí. Antes del commit
+comprobé que no tenían ninguna clave. Commit `67a401c`, subido.
+
+**Qué pasó:** en git solo existe lo que se guarda con un commit. Mientras no lo hice, los ficheros
+estaban en mi carpeta pero ni en el historial ni en GitHub. Llevo **5 commits de los 10**.
+
+**Conclusión:**
+✏️ CONCLUSIÓN 14 (escríbela tú): ¿por qué hay que hacer un commit para que algo "exista" en git?
+¿Por qué no hace falta un commit por cada fichero?
+
+---
+
+## Paso 15 · El `AGENTS.md`: las normas del agente (1 nov)
+
+**Qué quería:** dejar escritas, para OpenCode, las normas del proyecto. Lo lee al empezar cada sesión.
+
+**Qué hice:** creé `AGENTS.md` en la raíz con la plantilla del curso (stack, órdenes y normas), la
+leí línea a línea y añadí una norma mía sobre no borrar fotos sin permiso. Commit `f0980c2`,
+subido. Llevo **6 commits de los 10**.
+
+**Conclusión:**
+✏️ CONCLUSIÓN 15 (escríbela tú): ¿qué es `AGENTS.md` y qué diferencia hay con `opencode.json`?
+¿Qué norma he añadido yo y por qué?
+
+---
+
+## Paso 16 · Sin agente del instituto: modelo gratuito (2 nov)
+
+**Qué quería:** poder usar OpenCode aunque el profesor no pueda darme acceso a los modelos del centro.
+
+**Qué pasó:** el profesor me contestó que no hay VPN a los servidores de IA (prohibido por ley) y que
+desde casa se usa OpenCode con modelos *free* (o el Copilot de Conselleria, que es solo para consultas).
+`opencode models` me listó los modelos `opencode/...-free`. Probé:
+
+```
+opencode run --model opencode/big-pickle "Responde solo: hola"
+```
+
+y contestó `hola`. Después puse `opencode/big-pickle` como modelo por defecto en mi config global
+(`%USERPROFILE%\.config\opencode\opencode.json`, que está **fuera** del repo).
+
+Importante: con los modelos gratuitos mis mensajes se guardan en un servidor de terceros, así que
+nunca les paso claves ni datos personales.
+
+**Conclusión:**
+✏️ CONCLUSIÓN 16 (escríbela tú): ¿qué diferencia hay entre el modelo del centro y uno gratuito?
+¿Qué cuidados tengo con los datos?
+
+---
+
+## Paso 17 · acciones.json: mis dos primeras acciones (2 nov)
+
+**Qué quería:** escribir yo, sin IA, las acciones de mi herramienta.
+
+**Qué hice:** creé `acciones.json` con `borrar-temporales` (tipo `borrar`, `.tmp` de más de 30 días,
+`confirmar: true`) y `renombrar-fotos` (tipo `renombrar`, con una `plantilla` con contador y fecha).
+Fui corrigiendo: dos puntos que faltaban, `true` sin comillas, nombres en minúsculas con guion,
+el `tipo` en español y la `plantilla` obligatoria en `renombrar`.
+
+**Qué pasó:** subí `acciones.json` con un fallo: faltaban comas entre los elementos de la lista de
+extensiones. Lo detecté con `Get-Content acciones.json | ConvertFrom-Json` (daba *Se esperaba ','*).
+Lo corregí en un commit nuevo (`1ff9728`) sin tocar el historial. Llevo **9 commits de los 10**.
+Otra vez me pasó que el fichero estaba **sin guardar** (Ctrl+S) y por eso daba error.
+
+**Conclusión:**
+✏️ CONCLUSIÓN 17 (escríbela tú): ¿por qué hay que comprobar el JSON antes del commit?
+¿Qué cosas pasan con las comas y las comillas en JSON?
+
+---
+
+## Lo que viene después
+
+- Tercera acción: mover las fotos (con `destino` en la carpeta de pruebas mientras pruebo)
+- Preguntar al profesor qué versión de OpenCode hay que usar (1.18.35 o la 2)
+- Skill `acciones-json`, comando `/nueva-accion` y subagente `revisor` en `.opencode/`
+- ADR 0001: por qué las acciones van en un JSON y no en el código
+- Que el agente (con el modelo gratuito) programe la validación y el motor; yo audito cada cambio
