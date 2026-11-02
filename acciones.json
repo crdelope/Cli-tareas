@@ -13,7 +13,7 @@
       		"descripcion": "renombra archivos jpg, con la fecha de la foto",
 		"plantilla": "foto-{n:03}_{fecha:%Y-%m-%d}{ext}",
       		"tipo": "renombrar",
-      		"filtro": { "extensiones": [".jpg" ".jpeg" ".png"]},
+      		"filtro": { "extensiones": [".jpg", ".jpeg", ".png"]},
       		"confirmar": true
     	}
 	
