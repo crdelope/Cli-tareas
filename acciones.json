@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "acciones": [
+    {
+      "nombre": "borrar-temporales",
+      "descripcion": "Borra los ficheros .tmp de la carpeta indicada",
+      "tipo": "borrar",
+      "filtro": { "extensiones": [".tmp"], "mas_antiguo_que_dias": 30 },
+      "confirmar": true
+    }
+  ]
+}
