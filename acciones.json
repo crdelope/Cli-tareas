@@ -15,6 +15,13 @@
       		"tipo": "renombrar",
       		"filtro": { "extensiones": [".jpg", ".jpeg", ".png"]},
       		"confirmar": true
+    	},
+	{
+      		"nombre": "mover-fotos",
+      		"descripcion": "mueve las fotos a la carpeta Fotos2026",
+		"destino": "~/pruebas-tareas/Fotos2026",
+		"tipo": "mover",
+      		"filtro": { "extensiones": [".jpg", ".jpeg", ".png"]}
     	}
 	
   ]
