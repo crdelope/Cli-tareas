@@ -438,10 +438,44 @@ Otra vez me pasó que el fichero estaba **sin guardar** (Ctrl+S) y por eso daba 
 
 ---
 
+## Paso 18 · La tercera acción y el undécimo commit (6 nov)
+
+**Qué quería:** tener mis tres acciones escritas en `acciones.json`.
+
+**Qué hice:** escribí `mover-fotos` (tipo `mover`, con `filtro` de extensiones y `destino`).
+Al principio copié campos de `renombrar-fotos` que sobraban: `plantilla` es solo para `renombrar`
+y `confirmar` solo para acciones que borran. Mover necesita `destino`.
+
+**Qué pasó:** otra vez faltaba una **coma** entre dos acciones (`},` y `{`) y la comprobación
+dio *Se esperaba ','*. La puse, comprobé de nuevo y subí el commit `450ddb3`.
+Llevo **11 commits**.
+
+**Conclusión:**
+✏️ CONCLUSIÓN 18 (escríbela tú): ¿qué campos necesita cada tipo de acción
+(`mover`, `renombrar`, `borrar`)? ¿Por qué `confirmar` solo va en las que borran?
+
+---
+
+## Paso 19 · El ADR y esta guía (7 nov)
+
+**Qué quería:** escribir mi primer ADR y entender los conceptos que me faltaban.
+
+**Qué hice:** escribí un borrador del ADR-0001 en `docs/adr/`. Me señalaron que el contexto debe
+hablar de mis fotos, que las alternativas se comparan por *dónde viven las acciones* y que
+las consecuencias deben incluir lo que me pasó con las comas. Aún lo estoy corrigiendo.
+Además tengo una guía nueva, `docs/guia-conceptos.md`, que explica cada herramienta y cada
+fichero con palabras sencillas.
+
+**Conclusión:**
+✏️ CONCLUSIÓN 19 (escríbela tú): ¿qué es un ADR y por qué es **uno** y no uno por acción?
+
+---
+
 ## Lo que viene después
 
-- Tercera acción: mover las fotos (con `destino` en la carpeta de pruebas mientras pruebo)
+- Corregir y subir el ADR (commit)
+- Skill `acciones-json` y comando `/nueva-accion` en `.opencode/` (commits)
+- Subagente `revisor` (cuando el profesor aclare la versión de OpenCode)
+- Que el agente construya `cli.py` (`--help`, `version`, `listar`) y yo audite cada cambio
+- Validación y motor con `--simular`
 - Preguntar al profesor qué versión de OpenCode hay que usar (1.18.35 o la 2)
-- Skill `acciones-json`, comando `/nueva-accion` y subagente `revisor` en `.opencode/`
-- ADR 0001: por qué las acciones van en un JSON y no en el código
-- Que el agente (con el modelo gratuito) programe la validación y el motor; yo audito cada cambio
