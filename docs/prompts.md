@@ -26,4 +26,15 @@ Copio esta plantilla por cada prompt importante:
 
 ## Prompts
 
-_Todavía no hay prompts: aún no he instalado ni conectado OpenCode._
+### Prompt 1 · Crear cli.py con version y listar (8 nov 2026)
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+> Crea el archivo src/tareas/cli.py con Typer para que exista el comando `tareas`.
+> Debe tener: una variable `app` (Typer); el comando `version` (muestra __version__ de src/tareas/__init__.py); el comando `listar` (lee acciones.json y muestra con Rich una tabla con nombre, tipo y descripcion); y `tareas --help` debe funcionar.
+> Reglas: respeta AGENTS.md. Usa solo Typer y Rich. Si falta Rich, dímelo antes de instalarlo. No ejecutes ninguna acción sobre archivos todavía, solo listar. No toques ningún otro archivo. Antes de escribir nada, enséñame el plan.
+
+**Qué hizo:** Leer los archivos del proyecto con las directrices de las tareas que queremos crear y hace el archivo cli.py para habilitar los comandos --help y listar.
+**Lo que revisé en el diff:** Sólo se edita src/tareas/cli.py, que existe la variable app; que habían dos comandos (version y listar), que no había nada que borrara o moviera archivos. 
+**Resultado:** --help, version y listar funcionaron a la primera sin necesidad de cambiar nada. Añade version junto a --help y listar y comprobo que todo funcionara.
+**Commit:** Añado cli.py con los comandos version y listar
