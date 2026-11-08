@@ -16,11 +16,11 @@ description: Reglas para escribir o modificar acciones en acciones.json. Úsala 
 ## Campos según el tipo
 - `destino`: la carpeta a la que van los archivos, por ejemplo `"~/pruebas-tareas/Fotos2026"`. Obligatorio si el tipo es `mover` o `copiar`. No se usa en los otros tipos.
 - `plantilla`: cómo queda el nombre nuevo del archivo, por ejemplo `"foto-{n:03}_{fecha:%Y-%m-%d}{ext}"`. Obligatorio si el tipo es `renombrar`. Lleva estos huecos:
-    - `{fecha:%Y-%m-%d}`: ...
-    - `{n:03}`: ...
-    - `{ext}`: ...
-    - `{nombre}`: ...
-- `confirmar`: ...
+    - `{fecha:%Y-%m-%d}`: Pon la fecha de la foto con esta configuración, año-mes-día, por ejemplo 2026-10-14.
+    - `{n:03}`: Nombralas con un número que va subiendo, empezando por 001, siempre con 3 cifras.
+    - `{ext}`: usa la extensión del archivo de origen con el punto .jpeg 
+    - `{nombre}`: el nombre original del archivo, sin la extensión.
+- `confirmar`: si la herramienta pregunta antes de actuar. Se usa en las acciones de tipo `borrar`. El ejemplo es `true`, sin comillas.
 
 ## Reglas del JSON
 - Los textos van entre comillas.
