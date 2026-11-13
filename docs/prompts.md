@@ -69,17 +69,17 @@ Copio esta plantilla por cada prompt importante:
 
 
 > **Qué archivos:** Crea `src/tareas/motor.py` y añade en `src/tareas/cli.py` el comando `ejecutar`. Solo puedes cambiar esos dos archivos.
->
+
 > **Qué debe hacer:** `tareas ejecutar NOMBRE CARPETA [--simular]` busca la acción NOMBRE en `acciones.json` y la aplica a CARPETA. Por ahora solo el tipo `mover`: mueve los archivos de CARPETA (sin subcarpetas) al `destino` de la acción. Mueve solo los archivos que cumplan el filtro.
 > - Con `--simular`, el programa dice qué va a hacer sin hacerlo en realidad (ni siquiera crea la carpeta destino).
 > - Si ya existe un archivo con ese nombre en el destino, el programa me lo dice y nunca lo sobrescribe: me pide permiso y, si digo que sí, lo mueve añadiendo un 1 al final del nombre, antes de la extensión. Si sigue existiendo, añade otro 1, hasta que ya no se parezcan. Si digo que no, se salta ese archivo y sigue con los demás.
 > - Al terminar, el programa muestra lo que ha hecho y con qué archivos.
 > - Si la acción no existe, avisa en rojo y sale con código 1. Si CARPETA no existe, igual.
->
+
 > **Reglas:** sigue `AGENTS.md`. Solo librería estándar. No instales nada. No borres ninguna foto.
->
+
 > **Qué NO tocar:** `acciones.json`, `config.py` y `errores.py`. Para probar, usa solo carpetas dentro de `~/pruebas-tareas`.
->
+
 > **Antes de escribir nada, enséñame el plan.**
 
 **Qué hizo:** Creó los archivos que le pedí motor.py, modificó cli.py para añadir el comando ejecutar
@@ -89,7 +89,7 @@ Copio esta plantilla por cada prompt importante:
 
 ## Prompts
 
-### Prompt 4 · Modificar src/tareas/motor.py y src/tareas/cli.py. (13 nov 2026)
+### Prompt 4 · Modificar src/tareas/motor.py y src/tareas/cli.py, para añadir tipo renombrar. (13 nov 2026)
 
 **Agente:** plan (para ver el plan) y luego build
 **Prompt:**
@@ -107,12 +107,43 @@ Copio esta plantilla por cada prompt importante:
 
 
 > **Reglas:** sigue `AGENTS.md`. Solo librería estándar. No instales nada. No borres ninguna foto.
->
+
 > **Qué NO tocar:** `acciones.json`, `config.py` y `errores.py`. Para probar, usa solo carpetas dentro de `~/pruebas-tareas`. Pruebas sólo con --simular; Las pruebas reales las hago yo.
->
+
 > **Antes de escribir nada, enséñame el plan.**
 
 **Qué hizo:** Modificó motor.py y cli.py para añadir el tipo renombrar sin cambiar mover, y para que la tabla muestre solo el nombre del archivo.
 **Lo que revisé en el diff:** Revisé el resultado de Opencode y probé el resultado yo mismo.
 **Resultado:**  Probé renombrar con fotos que había incluido en la carpeta y con --simular no cambió nada, sin --simular renombró los archivos.
 **Commit:** Añade tipo renombrar y simplifica tabla de resultados.
+
+## Prompts
+
+### Prompt 5 · Modificar src/tareas/motor.py y src/tareas/cli.py, para añadir tipo borrar. (13 nov 2026)
+
+Texto redactado con ayuda de Claude
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+
+
+> **Qué archivos:** Modifica `src/tareas/motor.py` y, si hace falta, `src/tareas/cli.py`. No cambies cómo funcionan `mover` ni `renombrar`. Solo puedes cambiar esos dos archivos.
+
+> **Qué debe hacer:** Añade el tipo `borrar`. Debe mirar los archivos de CARPETA (sin subcarpetas) que cumplan el filtro de la acción, y nunca debe borrar carpetas.
+> - Si la acción no tiene filtro, no borra nada: avisa en rojo y sale con código 1, para no vaciar una carpeta por error.
+> - Antes de borrar, enséñame cuántos archivos son y sus nombres, y pídeme confirmación una sola vez. Pregunta siempre, aunque `confirmar` sea `false` o no esté en la acción. Si digo que no, no se borra nada.
+> - Si digo que sí, borra los archivos de verdad (no los mandes a ninguna papelera).
+> - Con `--simular`, muestra qué archivos se borrarían, sin borrar nada y sin preguntar.
+> - Al terminar, muestra qué archivos se han borrado. Si algo falla, avisa en rojo y sale con código 1.
+
+> **Reglas:** sigue `AGENTS.md`. Solo librería estándar. No instales nada. Tú no ejecutes ningún borrado real: prueba solo con `--simular`.
+
+> **Qué NO tocar:** `acciones.json`, `config.py` y `errores.py`. Para probar, usa solo carpetas dentro de `~/pruebas-tareas`. Las pruebas reales las hago yo.
+
+> **Antes de escribir nada, enséñame el plan.**
+
+**Qué hizo:** Modificó Motor.py y cli.py para añadir tipo borrar y borrar pide confirmación antes de borrar y no borra si la acción no tiene filtro.
+**Lo que revisé en el diff:** Modificó los archivos pidiendo autorización, no borró nada, pidió hacer cambios fuera de la carpeta del proyecto y lo rechacé, ya que le pedí que no hiciera modificaciones fuera.
+**Resultado:**  Motor.py actualizado con el tipo borrar y renombrar y mover intactos. Probé en prueba-borrar con archivos falsos: con --simular no borró nada; con y borró solo los .tmp de más de 30 días; con n no borró nada; y si no había archivos que cumplieran el filtro, avisó.
+**Commit:** Añade tipo borrar y actualiza cli.py y motor.py
+

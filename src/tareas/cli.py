@@ -73,13 +73,15 @@ def _mostrar_resultados(
     resultados: list[motor.Resultado], simular: bool, tipo: str
 ) -> None:
     es_renombrar = tipo == "renombrar"
+    es_borrar = tipo == "borrar"
 
     if simular:
-        mensaje = (
-            "SIMULACIÓN: no se ha renombrado nada."
-            if es_renombrar
-            else "SIMULACIÓN: no se ha movido ni creado nada."
-        )
+        if es_renombrar:
+            mensaje = "SIMULACIÓN: no se ha renombrado nada."
+        elif es_borrar:
+            mensaje = "SIMULACIÓN: no se ha borrado nada."
+        else:
+            mensaje = "SIMULACIÓN: no se ha movido ni creado nada."
         console.print(mensaje, style="yellow")
 
     if not resultados:
@@ -92,20 +94,21 @@ def _mostrar_resultados(
     tabla = Table(title="Resultado de la ejecución")
     tabla.add_column("estado")
     tabla.add_column("archivo")
-    tabla.add_column("nuevo nombre" if es_renombrar else "destino")
+    if not es_borrar:
+        tabla.add_column("nuevo nombre" if es_renombrar else "destino")
     tabla.add_column("motivo")
     for resultado in resultados:
-        tabla.add_row(
-            resultado.estado,
-            resultado.origen.name,
-            resultado.destino.name if resultado.destino else "-",
-            resultado.motivo,
-        )
+        fila = [resultado.estado, resultado.origen.name]
+        if not es_borrar:
+            fila.append(resultado.destino.name if resultado.destino else "-")
+        fila.append(resultado.motivo)
+        tabla.add_row(*fila)
     console.print(tabla)
 
     simulados = sum(1 for r in resultados if r.estado == "simulado")
     movidos = sum(1 for r in resultados if r.estado == "movido")
     renombrados = sum(1 for r in resultados if r.estado == "renombrado")
+    borrados = sum(1 for r in resultados if r.estado == "borrado")
     saltados = sum(1 for r in resultados if r.estado == "saltado")
     if simular:
         if es_renombrar:
@@ -113,11 +116,17 @@ def _mostrar_resultados(
                 f"Se renombrarían {simulados} archivo(s); "
                 f"saltados: {saltados}."
             )
+        elif es_borrar:
+            console.print(
+                f"Se borrarían {simulados} archivo(s); saltados: {saltados}."
+            )
         else:
             console.print(
                 f"Se moverían {simulados} archivo(s); saltados: {saltados}."
             )
     elif es_renombrar:
         console.print(f"Renombrados: {renombrados}; saltados: {saltados}.")
+    elif es_borrar:
+        console.print(f"Borrados: {borrados}; saltados: {saltados}.")
     else:
         console.print(f"Movidos: {movidos}; saltados: {saltados}.")

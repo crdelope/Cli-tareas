@@ -41,10 +41,13 @@ def ejecutar(
     tipo = accion.get("tipo")
     if tipo == "renombrar":
         return _ejecutar_renombrar(accion, carpeta, simular, preguntar)
+    if tipo == "borrar":
+        return _ejecutar_borrar(accion, carpeta, simular, preguntar)
     if tipo != "mover":
         raise TareasError(
             f"La acción '{accion.get('nombre', '')}' es de tipo "
-            f"'{tipo or ''}'; por ahora solo se pueden ejecutar 'mover' y 'renombrar'"
+            f"'{tipo or ''}'; por ahora solo se pueden ejecutar "
+            "'mover', 'renombrar' y 'borrar'"
         )
 
     origen = Path(carpeta).expanduser()
@@ -241,6 +244,63 @@ def _ejecutar_renombrar(
                 f"{objetivo.name}: {error}"
             ) from error
         resultados.append(Resultado(archivo, objetivo, "renombrado"))
+
+    return resultados
+
+
+def _ejecutar_borrar(
+    accion: dict[str, Any],
+    carpeta: str | Path,
+    simular: bool,
+    preguntar: Callable[[str], bool] | None,
+) -> list[Resultado]:
+    """Borra los archivos de una carpeta que cumplan el filtro de la acción."""
+    origen = Path(carpeta).expanduser()
+    if not origen.is_dir():
+        raise TareasError(f"La carpeta {origen} no existe o no es una carpeta")
+
+    filtro = accion.get("filtro") or {}
+    if not filtro:
+        raise TareasError(
+            f"La acción '{accion.get('nombre', '')}' no tiene filtro; "
+            "no se borra nada para no vaciar la carpeta por error"
+        )
+
+    archivos = sorted(
+        (
+            ruta
+            for ruta in origen.iterdir()
+            if ruta.is_file() and _cumple_filtro(ruta, filtro)
+        ),
+        key=lambda ruta: ruta.name.lower(),
+    )
+
+    if not archivos:
+        return []
+
+    if simular:
+        return [Resultado(archivo, None, "simulado") for archivo in archivos]
+
+    nombres = ", ".join(archivo.name for archivo in archivos)
+    mensaje = (
+        f"¿Borrar {len(archivos)} archivo(s) de {origen}? "
+        f"Archivos: {nombres}"
+    )
+    if preguntar is None or not preguntar(mensaje):
+        return [
+            Resultado(archivo, None, "saltado", "cancelado por el usuario")
+            for archivo in archivos
+        ]
+
+    resultados: list[Resultado] = []
+    for archivo in archivos:
+        try:
+            archivo.unlink()
+        except OSError as error:
+            raise TareasError(
+                f"No se pudo borrar {archivo.name}: {error}"
+            ) from error
+        resultados.append(Resultado(archivo, None, "borrado"))
 
     return resultados
 
