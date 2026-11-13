@@ -86,3 +86,33 @@ Copio esta plantilla por cada prompt importante:
 **Lo que revisé en el diff:** Modificaba los archivos pidiéndome autorización, nada de borrar, modifica el cli.py sin perder version ni --listar. 
 **Resultado:** Hice varias pruebas metiendo archivos varios foto-a.jpg, foto-b.jpg, foto-c.png, informe.pdf, texto.txt, para ver que movía sólo las fotos y no los .txt y .pdf y comprabar que el filtro funciona bien. 
 **Commit:** Añade motor.py y modifica el cli.py para introducir ejecutar con --simular en el código.
+
+## Prompts
+
+### Prompt 4 · Modificar src/tareas/motor.py y src/tareas/cli.py. (13 nov 2026)
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+
+
+> **Qué archivos:** Modifica `src/tareas/motor.py` y `src/tareas/cli.py`. No cambies cómo funciona mover. Solo puedes cambiar esos dos archivos.
+>
+> **Qué debe hacer:** 
+>– En la tabla de resultados, muestra solo el nombre de cada archivo, no la ruta entera, para que no salga cortado.
+>– Añade el tipo renombrar. Debe mirar los archivos de CARPETA (sin subcarpetas) que cumplan el filtro de la acción y renombrarlos en la misma carpeta con la plantilla de la acción. La fecha es la de modificación del archivo. Se numeran desde 001 por orden de nombre.
+>– Antes de cambiar nada, pídeme confirmación una sola vez, diciendo cuántos archivos vas a renombrar.
+>– Si el nombre nuevo ya existe, añade un 1 al nombre antes de la extensión. Si sigue existiendo, añade otro 1, hasta que se resuelva.
+>– Con --simular, muestra nombre antiguo -> nombre nuevo sin renombrar nada y sin preguntar.
+>– Si la plantilla no se puede aplicar, avisa en rojo y sale con código 1.
+
+
+> **Reglas:** sigue `AGENTS.md`. Solo librería estándar. No instales nada. No borres ninguna foto.
+>
+> **Qué NO tocar:** `acciones.json`, `config.py` y `errores.py`. Para probar, usa solo carpetas dentro de `~/pruebas-tareas`. Pruebas sólo con --simular; Las pruebas reales las hago yo.
+>
+> **Antes de escribir nada, enséñame el plan.**
+
+**Qué hizo:** Modificó motor.py y cli.py para añadir el tipo renombrar sin cambiar mover, y para que la tabla muestre solo el nombre del archivo.
+**Lo que revisé en el diff:** Revisé el resultado de Opencode y probé el resultado yo mismo.
+**Resultado:**  Probé renombrar con fotos que había incluido en la carpeta y con --simular no cambió nada, sin --simular renombró los archivos.
+**Commit:** Añade tipo renombrar y simplifica tabla de resultados.

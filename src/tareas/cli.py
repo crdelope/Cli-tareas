@@ -66,16 +66,21 @@ def ejecutar(
         console.print(str(error), style="red")
         raise typer.Exit(code=error.codigo)
 
-    _mostrar_resultados(resultados, simular)
+    _mostrar_resultados(resultados, simular, str(accion.get("tipo", "")))
 
 
 def _mostrar_resultados(
-    resultados: list[motor.Resultado], simular: bool
+    resultados: list[motor.Resultado], simular: bool, tipo: str
 ) -> None:
+    es_renombrar = tipo == "renombrar"
+
     if simular:
-        console.print(
-            "SIMULACIÓN: no se ha movido ni creado nada.", style="yellow"
+        mensaje = (
+            "SIMULACIÓN: no se ha renombrado nada."
+            if es_renombrar
+            else "SIMULACIÓN: no se ha movido ni creado nada."
         )
+        console.print(mensaje, style="yellow")
 
     if not resultados:
         console.print(
@@ -87,23 +92,32 @@ def _mostrar_resultados(
     tabla = Table(title="Resultado de la ejecución")
     tabla.add_column("estado")
     tabla.add_column("archivo")
-    tabla.add_column("destino")
+    tabla.add_column("nuevo nombre" if es_renombrar else "destino")
     tabla.add_column("motivo")
     for resultado in resultados:
         tabla.add_row(
             resultado.estado,
-            str(resultado.origen),
-            str(resultado.destino) if resultado.destino else "-",
+            resultado.origen.name,
+            resultado.destino.name if resultado.destino else "-",
             resultado.motivo,
         )
     console.print(tabla)
 
     simulados = sum(1 for r in resultados if r.estado == "simulado")
     movidos = sum(1 for r in resultados if r.estado == "movido")
+    renombrados = sum(1 for r in resultados if r.estado == "renombrado")
     saltados = sum(1 for r in resultados if r.estado == "saltado")
     if simular:
-        console.print(
-            f"Se moverían {simulados} archivo(s); saltados: {saltados}."
-        )
+        if es_renombrar:
+            console.print(
+                f"Se renombrarían {simulados} archivo(s); "
+                f"saltados: {saltados}."
+            )
+        else:
+            console.print(
+                f"Se moverían {simulados} archivo(s); saltados: {saltados}."
+            )
+    elif es_renombrar:
+        console.print(f"Renombrados: {renombrados}; saltados: {saltados}.")
     else:
         console.print(f"Movidos: {movidos}; saltados: {saltados}.")
