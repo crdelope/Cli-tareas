@@ -59,3 +59,30 @@ Copio esta plantilla por cada prompt importante:
 **Lo que revisé en el diff:** Que sólo tocara esos tres archivos, que config.py sólo usara librería estardard, que no hubiera nada que borrara archivos y que acciones.json no se modificara.
 **Resultado:** Bien. 19 casos pasan, probé a mano tareas listar con el archivo bueno (tabla) y con uno malo (mensaje rojo y codigo 3)
 **Commit:** Añado errores.py y config.py y modifico cli.py. Guardo el segundo prompt en opencode.
+
+## Prompts
+
+### Prompt 3 · Crear src/tareas/motor.py y añadir el comando `ejecutar` en src/tareas/cli.py (13 nov 2026)
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+
+
+> **Qué archivos:** Crea `src/tareas/motor.py` y añade en `src/tareas/cli.py` el comando `ejecutar`. Solo puedes cambiar esos dos archivos.
+>
+> **Qué debe hacer:** `tareas ejecutar NOMBRE CARPETA [--simular]` busca la acción NOMBRE en `acciones.json` y la aplica a CARPETA. Por ahora solo el tipo `mover`: mueve los archivos de CARPETA (sin subcarpetas) al `destino` de la acción. Mueve solo los archivos que cumplan el filtro.
+> - Con `--simular`, el programa dice qué va a hacer sin hacerlo en realidad (ni siquiera crea la carpeta destino).
+> - Si ya existe un archivo con ese nombre en el destino, el programa me lo dice y nunca lo sobrescribe: me pide permiso y, si digo que sí, lo mueve añadiendo un 1 al final del nombre, antes de la extensión. Si sigue existiendo, añade otro 1, hasta que ya no se parezcan. Si digo que no, se salta ese archivo y sigue con los demás.
+> - Al terminar, el programa muestra lo que ha hecho y con qué archivos.
+> - Si la acción no existe, avisa en rojo y sale con código 1. Si CARPETA no existe, igual.
+>
+> **Reglas:** sigue `AGENTS.md`. Solo librería estándar. No instales nada. No borres ninguna foto.
+>
+> **Qué NO tocar:** `acciones.json`, `config.py` y `errores.py`. Para probar, usa solo carpetas dentro de `~/pruebas-tareas`.
+>
+> **Antes de escribir nada, enséñame el plan.**
+
+**Qué hizo:** Creó los archivos que le pedí motor.py, modificó cli.py para añadir el comando ejecutar
+**Lo que revisé en el diff:** Modificaba los archivos pidiéndome autorización, nada de borrar, modifica el cli.py sin perder version ni --listar. 
+**Resultado:** Hice varias pruebas metiendo archivos varios foto-a.jpg, foto-b.jpg, foto-c.png, informe.pdf, texto.txt, para ver que movía sólo las fotos y no los .txt y .pdf y comprabar que el filtro funciona bien. 
+**Commit:** Añade motor.py y modifica el cli.py para introducir ejecutar con --simular en el código.
