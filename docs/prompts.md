@@ -28,6 +28,8 @@ Copio esta plantilla por cada prompt importante:
 
 ### Prompt 1 · Crear cli.py con version y listar (8 nov 2026)
 
+Texto redactado con ayuda de Claude
+
 **Agente:** plan (para ver el plan) y luego build
 **Prompt:**
 > Crea el archivo src/tareas/cli.py con Typer para que exista el comando `tareas`.
@@ -42,6 +44,8 @@ Copio esta plantilla por cada prompt importante:
 ## Prompts
 
 ### Prompt 2 · Crear errores.py y config.py y modifica cli.py (10 nov 2026)
+
+Texto redactado con ayuda de Claude
 
 **Agente:** plan (para ver el plan) y luego build
 **Prompt:**
@@ -63,6 +67,8 @@ Copio esta plantilla por cada prompt importante:
 ## Prompts
 
 ### Prompt 3 · Crear src/tareas/motor.py y añadir el comando `ejecutar` en src/tareas/cli.py (13 nov 2026)
+
+Texto redactado con ayuda de Claude
 
 **Agente:** plan (para ver el plan) y luego build
 **Prompt:**
@@ -90,6 +96,8 @@ Copio esta plantilla por cada prompt importante:
 ## Prompts
 
 ### Prompt 4 · Modificar src/tareas/motor.py y src/tareas/cli.py, para añadir tipo renombrar. (13 nov 2026)
+
+Texto redactado con ayuda de Claude
 
 **Agente:** plan (para ver el plan) y luego build
 **Prompt:**
@@ -146,4 +154,45 @@ Texto redactado con ayuda de Claude
 **Lo que revisé en el diff:** Modificó los archivos pidiendo autorización, no borró nada, pidió hacer cambios fuera de la carpeta del proyecto y lo rechacé, ya que le pedí que no hiciera modificaciones fuera.
 **Resultado:**  Motor.py actualizado con el tipo borrar y renombrar y mover intactos. Probé en prueba-borrar con archivos falsos: con --simular no borró nada; con y borró solo los .tmp de más de 30 días; con n no borró nada; y si no había archivos que cumplieran el filtro, avisó.
 **Commit:** Añade tipo borrar y actualiza cli.py y motor.py
+
+
+## Prompts
+
+### Prompt 6 · Capa de IA: ia.py y comprobar-ia (15 nov 2026).
+
+Texto redactado con ayuda de Claude
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+
+
+> **Qué archivos:** Crea `src/tareas/ia.py` y modifica `src/tareas/errores.py` y `src/tareas/cli.py`. Solo puedes crear `ia.py` y modificar `errores.py` y `cli.py`.
+
+> **Qué debe hacer:** 
+> - En `ia.py`, crea la clase `Respuesta`, que guarda el texto que le devuelve el modelo.
+> - En `ia.py`, crea la clase base `ProveedorIA`, con un método `completar(sistema, usuario, max_tokens)`, que devuelve una `Respuesta`.
+> - En `ia.py`, crea `ProveedorCentro`, que hereda de `ProveedorIA`. Lee la dirección, la clave y el modelo de las variables `CENTRO_IA_URL`, `CENTRO_IA_KEY` y `CENTRO_IA_MODELO`, cargándolas del archivo `.env` con `python-dotenv`. Para llamar al servidor usa `httpx`: hace un POST a `{CENTRO_IA_URL}/chat/completions`, envía la clave en la cabecera `Authorization: Bearer <clave>` y pone un tiempo máximo de espera.
+> - En `errores.py`, crea `IANoDisponible`, que hereda de `TareasError` y tiene código de salida 4.
+> - En `cli.py`, añade el comando `tareas comprobar-ia`, que hace una pregunta mínima al modelo, con `max_tokens` de 200, y dice si ha funcionado o no.
+>
+> **Reglas:**
+> - Los errores se muestran en español y en rojo, como los demás, con un mensaje claro para cada caso: falta la clave, no hay conexión, el servidor tarda demasiado, la clave es rechazada (401) y hay demasiadas peticiones (429).
+> - La clave nunca se imprime, ni en mensajes, ni en errores, ni en el resultado de `comprobar-ia`.
+> - Usa un margen de 200 tokens en `comprobar-ia`, porque el modelo piensa antes de contestar y con menos puede devolver vacío.
+>
+> **Qué NO tocar:**
+> - No toques `motor.py`, `config.py` ni `acciones.json`.
+> - No abras ni leas el archivo `.env`, ni muestres su contenido.
+> - No instales nada: las librerías ya están instaladas.
+> - No ejecutes `tareas comprobar-ia`: la prueba con la red la haré yo.
+
+
+> **Antes de escribir nada, enséñame el plan.**
+
+**Qué hizo:** Creó el archivo ia.py que contiene las clases Respuesta, ProveedorIA y ProveedorCentro y modificó el errores.py y el cli.py, creando el comando comprobar-ia y la clase IANoDisponible (código 4).
+**Lo que revisé en el diff:** En el plan vi un fallo: `load_dotenv()` sin más busca el `.env` desde la carpeta donde está `ia.py`. Ahora funciona porque el proyecto está en modo editable, pero si alguien lo instala con `uv tool install`, `ia.py` quedará en otro sitio y no encontrará el `.env` de su carpeta. Es lo mismo que con `acciones.json`, que se lee de la carpeta donde estoy ejecutando el comando. Se arregla con `load_dotenv(find_dotenv(usecwd=True))`, y se lo pedí al pasar a build. Después revisé `ia.py`: están los nombres de clase que pedí, no hay ningún `print` de la clave, los errores de variable dicen el nombre y no el valor, y el cambio de `find_dotenv` está incluido. (Aquí añade lo que veas en el `git diff` de `cli.py` y `errores.py`.). En cli.py solo se añadió el comando comprobar-ia y el import de ia; en errores.py solo IANoDisponible con código 4. No se tocó ningún otro comando.
+**Resultado:** Con la clave buena, `comprobar-ia` contesta "hola". Probé los errores: con una clave errónea sale el 401, con una dirección errónea sale "No hay conexión", y quitando el `.env` de su sitio sale "Falta la variable". En todos el código de salida es 4. Probé también con una variable vacía, pero PowerShell la borra, así que esa prueba no sirve.
+**Commit:** Añado la capa de la IA: ia.py, IANoDisponible (Codigo 4) y comprobar-ia.
+
+
 

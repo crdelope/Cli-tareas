@@ -6,7 +6,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from tareas import __version__, motor
+from tareas import __version__, ia, motor
 from tareas.config import cargar_acciones
 from tareas.errores import TareasError
 
@@ -18,6 +18,26 @@ console = Console()
 def version() -> None:
     """Muestra la versión instalada de tareas."""
     console.print(__version__)
+
+
+@app.command("comprobar-ia")
+def comprobar_ia() -> None:
+    """Comprueba que la IA del centro responde."""
+    try:
+        proveedor = ia.ProveedorCentro()
+        respuesta = proveedor.completar(
+            sistema="Responde de forma breve y en español.",
+            usuario="Responde solo con la palabra: hola",
+            max_tokens=200,
+        )
+    except TareasError as error:
+        console.print(str(error), style="red")
+        raise typer.Exit(code=error.codigo)
+
+    console.print("La IA funciona correctamente.", style="green")
+    texto = respuesta.texto.strip()
+    if texto:
+        console.print(f"Respuesta: {texto}")
 
 
 @app.command()

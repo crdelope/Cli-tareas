@@ -13,6 +13,12 @@ class ConfigError(TareasError):
     codigo = 3
 
 
+class IANoDisponible(TareasError):
+    """El proveedor de IA no está disponible."""
+
+    codigo = 4
+
+
 class AccionNoValida(ConfigError):
     """Una acción de acciones.json no cumple las reglas."""
 
