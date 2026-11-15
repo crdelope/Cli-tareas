@@ -192,7 +192,49 @@ Texto redactado con ayuda de Claude
 **Qué hizo:** Creó el archivo ia.py que contiene las clases Respuesta, ProveedorIA y ProveedorCentro y modificó el errores.py y el cli.py, creando el comando comprobar-ia y la clase IANoDisponible (código 4).
 **Lo que revisé en el diff:** En el plan vi un fallo: `load_dotenv()` sin más busca el `.env` desde la carpeta donde está `ia.py`. Ahora funciona porque el proyecto está en modo editable, pero si alguien lo instala con `uv tool install`, `ia.py` quedará en otro sitio y no encontrará el `.env` de su carpeta. Es lo mismo que con `acciones.json`, que se lee de la carpeta donde estoy ejecutando el comando. Se arregla con `load_dotenv(find_dotenv(usecwd=True))`, y se lo pedí al pasar a build. Después revisé `ia.py`: están los nombres de clase que pedí, no hay ningún `print` de la clave, los errores de variable dicen el nombre y no el valor, y el cambio de `find_dotenv` está incluido. (Aquí añade lo que veas en el `git diff` de `cli.py` y `errores.py`.). En cli.py solo se añadió el comando comprobar-ia y el import de ia; en errores.py solo IANoDisponible con código 4. No se tocó ningún otro comando.
 **Resultado:** Con la clave buena, `comprobar-ia` contesta "hola". Probé los errores: con una clave errónea sale el 401, con una dirección errónea sale "No hay conexión", y quitando el `.env` de su sitio sale "Falta la variable". En todos el código de salida es 4. Probé también con una variable vacía, pero PowerShell la borra, así que esa prueba no sirve.
-**Commit:** Añado la capa de la IA: ia.py, IANoDisponible (Codigo 4) y comprobar-ia.
+**Commit:** 05494d5 Añado la capa de la IA: ia.py, IANoDisponible (Codigo 4) y comprobar-ia.
+
+## Prompts
+
+### Prompt 7 · Validar en config.py las acciones resumir y clasificar (15 nov 2026)
+
+Texto redactado con ayuda de Claude
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+
+
+> **Qué archivos:** Modifica solo `src/tareas/config.py`.
+>
+> **Qué debe hacer:** Acepta y valida dos tipos de acción nuevos: `resumir` y `clasificar`.
+> - `resumir`:
+>   - `instrucciones` es obligatoria y debe ser un texto no vacío.
+>   - `max_caracteres` es opcional, un número entero entre 500 y 50000. Si no está, vale 12000.
+>   - `filtro` es opcional, igual que en las otras acciones.
+> - `clasificar`:
+>   - `categorias` es obligatoria, una lista de al menos 2 textos no vacíos, y debe incluir `otros`.
+>   - `instrucciones` es opcional, pero si está debe ser un texto no vacío.
+>   - `max_caracteres` y `filtro` funcionan igual que en `resumir`.
+>
+> **Reglas:**
+> - Los errores de validación usan los mismos errores y el mismo código de salida (3) que los demás. Los mensajes van en español y dicen qué acción y qué campo falla.
+> - Las acciones `mover`, `renombrar` y `borrar` siguen validando exactamente igual que ahora.
+> - Los tipos nuevos solo se validan: todavía no se ejecutan.
+>
+> **Qué NO tocar:**
+> - No toques `motor.py`, `cli.py`, `ia.py`, `errores.py` ni `acciones.json`.
+> - No abras ni leas el archivo `.env`.
+> - No instales nada.
+> - No llames a la IA.
+>
+> **Pruebas:** Haz las pruebas con `uv run python -` en línea, sin crear archivos fuera del proyecto. Enséñame un caso válido y otro inválido de `resumir` y de `clasificar`.
+>
+> **Antes de escribir nada, enséñame el plan.**
+
+**Qué hizo:** Modificó el archivo config.py para incluir dos acciones nuevas: resumir y clasificar.
+**Lo que revisé en el diff:** Que solo modificó config.py, que las ramas mover, renombrar y borrar no han sido tocadas, que los mensajes de error están en español y dicen acción y campo, que el valor por defecto 12000 no se escribe en ningún sitio. comprobamos una línea que se repetía en el diff pero era sólo cosa del visor lo comprobamos con Select-string.
+**Resultado:** Opencode ejecutó 40 pruebas en línea y pasaron todas. Todo los errores nuevos aparecen con código 3. uv run tareas listar sigue enseñando mis tres acciones. y las pruebas no se guardaron en ningún archivo: más adelante las convertiremos en pytest.
+**Commit:** Modifico el archivo config.py para incluir: resumir y clasificar.
 
 
 

@@ -7,7 +7,7 @@ from typing import Any
 
 from tareas.errores import AccionNoValida, ConfigError
 
-TIPOS_VALIDOS = {"mover", "copiar", "renombrar", "borrar"}
+TIPOS_VALIDOS = {"mover", "copiar", "renombrar", "borrar", "resumir", "clasificar"}
 PATRON_NOMBRE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
@@ -95,6 +95,15 @@ def _validar_accion(accion: Any, indice: int, nombres_vistos: set[str]) -> None:
         if not isinstance(accion["confirmar"], bool):
             raise AccionNoValida(nombre, "confirmar", "debe ser true o false")
 
+    if tipo == "resumir":
+        _campo_texto_obligatorio(accion, nombre, "instrucciones")
+        _validar_max_caracteres(accion, nombre)
+
+    if tipo == "clasificar":
+        _validar_categorias(accion, nombre)
+        _campo_texto_opcional(accion, nombre, "instrucciones")
+        _validar_max_caracteres(accion, nombre)
+
     if "filtro" in accion:
         _validar_filtro(accion["filtro"], nombre)
 
@@ -109,6 +118,61 @@ def _campo_texto_obligatorio(
             campo,
             f"es obligatorio para el tipo '{accion.get('tipo')}' "
             "y debe ser un texto no vacío",
+        )
+
+
+def _campo_texto_opcional(
+    accion: dict[str, Any], nombre: str, campo: str
+) -> None:
+    if campo not in accion:
+        return
+    valor = accion[campo]
+    if not isinstance(valor, str) or not valor.strip():
+        raise AccionNoValida(
+            nombre, campo, "debe ser un texto no vacío si se indica"
+        )
+
+
+def _validar_max_caracteres(accion: dict[str, Any], nombre: str) -> None:
+    if "max_caracteres" not in accion:
+        return
+    valor = accion["max_caracteres"]
+    if isinstance(valor, bool) or not isinstance(valor, int):
+        raise AccionNoValida(
+            nombre, "max_caracteres", "debe ser un número entero entre 500 y 50000"
+        )
+    if not 500 <= valor <= 50000:
+        raise AccionNoValida(
+            nombre, "max_caracteres", "debe estar entre 500 y 50000"
+        )
+
+
+def _validar_categorias(accion: dict[str, Any], nombre: str) -> None:
+    if "categorias" not in accion:
+        raise AccionNoValida(
+            nombre,
+            "categorias",
+            "es obligatoria y debe ser una lista de al menos dos textos",
+        )
+    categorias = accion["categorias"]
+    if not isinstance(categorias, list):
+        raise AccionNoValida(
+            nombre,
+            "categorias",
+            "es obligatoria y debe ser una lista de al menos dos textos",
+        )
+    if len(categorias) < 2:
+        raise AccionNoValida(
+            nombre, "categorias", "debe tener al menos dos textos"
+        )
+    for categoria in categorias:
+        if not isinstance(categoria, str) or not categoria.strip():
+            raise AccionNoValida(
+                nombre, "categorias", "todos los elementos deben ser textos no vacíos"
+            )
+    if "otros" not in categorias:
+        raise AccionNoValida(
+            nombre, "categorias", "debe incluir la categoría 'otros'"
         )
 
 
