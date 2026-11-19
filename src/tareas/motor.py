@@ -9,6 +9,12 @@ from pathlib import Path
 from typing import Any, Callable
 
 from tareas.errores import TareasError
+from tareas.ia import ProveedorIA
+
+MAX_CARACTERES_POR_DEFECTO = 12000
+MAX_TOKENS_RESUMEN = 1500
+SUFIJO_RESUMEN = ".resumen.md"
+EXTENSIONES_RESUMEN = [".txt", ".md"]
 
 
 @dataclass
@@ -36,9 +42,12 @@ def ejecutar(
     carpeta: str | Path,
     simular: bool = False,
     preguntar: Callable[[str], bool] | None = None,
+    proveedor: ProveedorIA | None = None,
 ) -> list[Resultado]:
-    """Aplica una acción de tipo mover o renombrar a los archivos de una carpeta."""
+    """Aplica una acción a los archivos de una carpeta."""
     tipo = accion.get("tipo")
+    if tipo == "resumir":
+        return _ejecutar_resumir(accion, carpeta, simular, proveedor)
     if tipo == "renombrar":
         return _ejecutar_renombrar(accion, carpeta, simular, preguntar)
     if tipo == "borrar":
@@ -122,6 +131,117 @@ def ejecutar(
             resultados.append(Resultado(archivo, objetivo, "movido"))
 
         nombres_usados.add(objetivo.name)
+
+    return resultados
+
+
+def _ejecutar_resumir(
+    accion: dict[str, Any],
+    carpeta: str | Path,
+    simular: bool,
+    proveedor: ProveedorIA | None,
+) -> list[Resultado]:
+    """Guarda un resumen de cada archivo de texto que cumpla el filtro."""
+    origen = Path(carpeta).expanduser()
+    if not origen.is_dir():
+        raise TareasError(f"La carpeta {origen} no existe o no es una carpeta")
+
+    instrucciones = accion.get("instrucciones")
+    if not isinstance(instrucciones, str) or not instrucciones.strip():
+        raise TareasError(
+            f"La acción '{accion.get('nombre', '')}' no tiene instrucciones válidas"
+        )
+
+    if not simular and proveedor is None:
+        raise TareasError(
+            f"Falta el proveedor de IA para ejecutar la acción "
+            f"'{accion.get('nombre', '')}'"
+        )
+
+    max_caracteres = accion.get("max_caracteres", MAX_CARACTERES_POR_DEFECTO)
+    filtro = dict(accion.get("filtro") or {})
+    filtro.setdefault("extensiones", EXTENSIONES_RESUMEN)
+
+    archivos = sorted(
+        (
+            ruta
+            for ruta in origen.iterdir()
+            if ruta.is_file()
+            and not ruta.name.lower().endswith(SUFIJO_RESUMEN)
+            and _cumple_filtro(ruta, filtro)
+        ),
+        key=lambda ruta: ruta.name.lower(),
+    )
+
+    resultados: list[Resultado] = []
+    nombres_usados: set[str] = set()
+
+    for archivo in archivos:
+        try:
+            texto = archivo.read_text(encoding="utf-8")
+        except UnicodeDecodeError as error:
+            resultados.append(
+                Resultado(
+                    archivo,
+                    None,
+                    "saltado",
+                    f"no se puede leer como UTF-8: {error}",
+                )
+            )
+            continue
+        except OSError as error:
+            resultados.append(
+                Resultado(
+                    archivo,
+                    None,
+                    "saltado",
+                    f"no se pudo leer el archivo: {error}",
+                )
+            )
+            continue
+
+        fragmento = texto[:max_caracteres]
+        nombre_resumen = f"{archivo.stem}{SUFIJO_RESUMEN}"
+        destino = _nombre_libre(origen, nombre_resumen, nombres_usados)
+
+        if simular:
+            resultados.append(
+                Resultado(
+                    archivo,
+                    destino,
+                    "simulado",
+                    f"enviaría {len(fragmento)} caracteres",
+                )
+            )
+            nombres_usados.add(destino.name)
+            continue
+
+        respuesta = proveedor.completar(
+            sistema=instrucciones,
+            usuario=fragmento,
+            max_tokens=MAX_TOKENS_RESUMEN,
+        )
+        resumen = respuesta.texto.strip()
+        if not resumen:
+            resultados.append(
+                Resultado(
+                    archivo,
+                    None,
+                    "saltado",
+                    "la IA devolvió un texto vacío",
+                )
+            )
+            continue
+
+        try:
+            destino.write_text(resumen, encoding="utf-8")
+        except OSError as error:
+            raise TareasError(
+                f"No se pudo guardar el resumen de {archivo.name} "
+                f"en {destino.name}: {error}"
+            ) from error
+        resultados.append(Resultado(archivo, destino, "resumido"))
+        nombres_usados.add(destino.name)
 
     return resultados
 

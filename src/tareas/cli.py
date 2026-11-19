@@ -76,11 +76,15 @@ def ejecutar(
     try:
         acciones = cargar_acciones(Path("acciones.json"))
         accion = motor.buscar_accion(acciones, nombre)
+        proveedor: ia.ProveedorIA | None = None
+        if accion.get("tipo") == "resumir" and not simular:
+            proveedor = ia.ProveedorCentro()
         resultados = motor.ejecutar(
             accion,
             carpeta,
             simular=simular,
             preguntar=lambda mensaje: typer.confirm(mensaje, default=False),
+            proveedor=proveedor,
         )
     except TareasError as error:
         console.print(str(error), style="red")
@@ -94,12 +98,15 @@ def _mostrar_resultados(
 ) -> None:
     es_renombrar = tipo == "renombrar"
     es_borrar = tipo == "borrar"
+    es_resumir = tipo == "resumir"
 
     if simular:
         if es_renombrar:
             mensaje = "SIMULACIÓN: no se ha renombrado nada."
         elif es_borrar:
             mensaje = "SIMULACIÓN: no se ha borrado nada."
+        elif es_resumir:
+            mensaje = "SIMULACIÓN: no se ha resumido ni creado nada."
         else:
             mensaje = "SIMULACIÓN: no se ha movido ni creado nada."
         console.print(mensaje, style="yellow")
@@ -115,7 +122,13 @@ def _mostrar_resultados(
     tabla.add_column("estado")
     tabla.add_column("archivo")
     if not es_borrar:
-        tabla.add_column("nuevo nombre" if es_renombrar else "destino")
+        if es_renombrar:
+            cabecera = "nuevo nombre"
+        elif es_resumir:
+            cabecera = "resumen"
+        else:
+            cabecera = "destino"
+        tabla.add_column(cabecera)
     tabla.add_column("motivo")
     for resultado in resultados:
         fila = [resultado.estado, resultado.origen.name]
@@ -129,6 +142,7 @@ def _mostrar_resultados(
     movidos = sum(1 for r in resultados if r.estado == "movido")
     renombrados = sum(1 for r in resultados if r.estado == "renombrado")
     borrados = sum(1 for r in resultados if r.estado == "borrado")
+    resumidos = sum(1 for r in resultados if r.estado == "resumido")
     saltados = sum(1 for r in resultados if r.estado == "saltado")
     if simular:
         if es_renombrar:
@@ -140,6 +154,10 @@ def _mostrar_resultados(
             console.print(
                 f"Se borrarían {simulados} archivo(s); saltados: {saltados}."
             )
+        elif es_resumir:
+            console.print(
+                f"Se resumirían {simulados} archivo(s); saltados: {saltados}."
+            )
         else:
             console.print(
                 f"Se moverían {simulados} archivo(s); saltados: {saltados}."
@@ -148,5 +166,7 @@ def _mostrar_resultados(
         console.print(f"Renombrados: {renombrados}; saltados: {saltados}.")
     elif es_borrar:
         console.print(f"Borrados: {borrados}; saltados: {saltados}.")
+    elif es_resumir:
+        console.print(f"Resumidos: {resumidos}; saltados: {saltados}.")
     else:
         console.print(f"Movidos: {movidos}; saltados: {saltados}.")

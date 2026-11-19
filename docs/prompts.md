@@ -24,7 +24,6 @@ Copio esta plantilla por cada prompt importante:
 
 ---
 
-## Prompts
 
 ### Prompt 1 · Crear cli.py con version y listar (8 nov 2026)
 
@@ -41,7 +40,6 @@ Texto redactado con ayuda de Claude
 **Resultado:** --help, version y listar funcionaron a la primera sin necesidad de cambiar nada. Añade version junto a --help y listar y comprobo que todo funcionara.
 **Commit:** Añado cli.py con los comandos version y listar
 
-## Prompts
 
 ### Prompt 2 · Crear errores.py y config.py y modifica cli.py (10 nov 2026)
 
@@ -64,7 +62,6 @@ Texto redactado con ayuda de Claude
 **Resultado:** Bien. 19 casos pasan, probé a mano tareas listar con el archivo bueno (tabla) y con uno malo (mensaje rojo y codigo 3)
 **Commit:** Añado errores.py y config.py y modifico cli.py. Guardo el segundo prompt en opencode.
 
-## Prompts
 
 ### Prompt 3 · Crear src/tareas/motor.py y añadir el comando `ejecutar` en src/tareas/cli.py (13 nov 2026)
 
@@ -93,7 +90,6 @@ Texto redactado con ayuda de Claude
 **Resultado:** Hice varias pruebas metiendo archivos varios foto-a.jpg, foto-b.jpg, foto-c.png, informe.pdf, texto.txt, para ver que movía sólo las fotos y no los .txt y .pdf y comprabar que el filtro funciona bien. 
 **Commit:** Añade motor.py y modifica el cli.py para introducir ejecutar con --simular en el código.
 
-## Prompts
 
 ### Prompt 4 · Modificar src/tareas/motor.py y src/tareas/cli.py, para añadir tipo renombrar. (13 nov 2026)
 
@@ -125,7 +121,6 @@ Texto redactado con ayuda de Claude
 **Resultado:**  Probé renombrar con fotos que había incluido en la carpeta y con --simular no cambió nada, sin --simular renombró los archivos.
 **Commit:** Añade tipo renombrar y simplifica tabla de resultados.
 
-## Prompts
 
 ### Prompt 5 · Modificar src/tareas/motor.py y src/tareas/cli.py, para añadir tipo borrar. (13 nov 2026)
 
@@ -155,8 +150,6 @@ Texto redactado con ayuda de Claude
 **Resultado:**  Motor.py actualizado con el tipo borrar y renombrar y mover intactos. Probé en prueba-borrar con archivos falsos: con --simular no borró nada; con y borró solo los .tmp de más de 30 días; con n no borró nada; y si no había archivos que cumplieran el filtro, avisó.
 **Commit:** Añade tipo borrar y actualiza cli.py y motor.py
 
-
-## Prompts
 
 ### Prompt 6 · Capa de IA: ia.py y comprobar-ia (15 nov 2026).
 
@@ -194,7 +187,6 @@ Texto redactado con ayuda de Claude
 **Resultado:** Con la clave buena, `comprobar-ia` contesta "hola". Probé los errores: con una clave errónea sale el 401, con una dirección errónea sale "No hay conexión", y quitando el `.env` de su sitio sale "Falta la variable". En todos el código de salida es 4. Probé también con una variable vacía, pero PowerShell la borra, así que esa prueba no sirve.
 **Commit:** 05494d5 Añado la capa de la IA: ia.py, IANoDisponible (Codigo 4) y comprobar-ia.
 
-## Prompts
 
 ### Prompt 7 · Validar en config.py las acciones resumir y clasificar (15 nov 2026)
 
@@ -236,5 +228,43 @@ Texto redactado con ayuda de Claude
 **Resultado:** Opencode ejecutó 40 pruebas en línea y pasaron todas. Todo los errores nuevos aparecen con código 3. uv run tareas listar sigue enseñando mis tres acciones. y las pruebas no se guardaron en ningún archivo: más adelante las convertiremos en pytest.
 **Commit:** Valido en config.py las acciones resumir y clasificar.
 
+### Prompt 8 · Que resumir funcione (19 nov 2026)
 
+Texto redactado con ayuda de Claude
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+
+> **Qué archivos:** Modifica solo `src/tareas/motor.py` y `src/tareas/cli.py`.
+>
+> **Qué debe hacer:** Implementa la acción de tipo `resumir`.
+> - Para cada archivo de la carpeta que cumpla el filtro, lee el texto y se lo manda a la IA con las `instrucciones` de la acción.
+> - Si el filtro no indica extensiones, usa `.txt` y `.md`. Ignora los archivos que ya terminan en `.resumen.md`.
+> - Envía como mucho `max_caracteres` del texto (12000 si la acción no lo indica: el valor por defecto se aplica aquí).
+> - Guarda el resumen en un archivo nuevo junto al original: `apuntes.txt` pasa a `apuntes.resumen.md`. Si ya existe, no lo pisa: añade un `1` como en `mover`.
+> - Con `--simular` no llama a la IA ni escribe nada: muestra "enviaría N caracteres" por cada archivo.
+> - `ejecutar` recibe el proveedor de IA desde fuera (como ya recibe `preguntar`), para poder probarlo con uno falso. En `cli.py`, `ProveedorCentro` solo se crea si la acción es de tipo `resumir` y no es `--simular`.
+> - Pide a la IA 1500 `max_tokens`, porque el modelo piensa antes de contestar.
+> - Si la IA devuelve un texto vacío, salta ese archivo y explica el motivo.
+> - La tabla de resultados añade un contador de "Resumidos".
+>
+> **Reglas:**
+> - Si la IA falla, la acción se para con `IANoDisponible` (código 4). Los resúmenes ya hechos se quedan.
+> - Nunca se modifica ni se borra un archivo original.
+> - `mover`, `renombrar` y `borrar` no cambian. El tipo `clasificar` sigue sin ejecutarse y da el error de siempre.
+>
+> **Qué NO tocar:**
+> - No toques `config.py`, `ia.py`, `errores.py` ni `acciones.json`.
+> - No abras ni leas el archivo `.env`.
+> - No instales nada.
+> - No llames a la IA con red: la prueba real la haré yo.
+>
+> **Pruebas:** Haz las pruebas con `uv run python -` en línea, con un `ProveedorIA` falso que devuelva un texto fijo, y solo dentro de una carpeta temporal o de `~/pruebas-tareas/`. Prueba `--simular` y comprueba que no se crea ningún archivo.
+>
+> **Antes de escribir nada, enséñame el plan.**
+
+**Qué hizo:** Modificó `motor.py`, donde añadió la acción de tipo `resumir` (lee los archivos de texto, los manda a la IA, guarda el resumen en un archivo `.resumen.md` junto al original y no pisa archivos existentes), y `cli.py`, donde crea el proveedor de IA solo cuando hace falta y añade el mensaje de simulación y el contador "Resumidos".
+**Lo que revisé en el diff:** Comprobé en `cli.py` que `ProveedorCentro()` solo se crea si la acción es `resumir` y no hay `--simular`, y que está dentro del `try`, así que un fallo de la IA sale en rojo con código 4. Comprobé que solo había cambios para `resumir` y que `mover`, `renombrar` y `borrar` no se tocaron. Además, `config.py`, `ia.py`, `errores.py` y `.env` no se modificaron. Después añadí yo la acción `resumir-apuntes` a `acciones.json`.
+**Resultado:** OpenCode hizo pruebas con un proveedor falso: simulación sin escribir nada ni llamar a la IA, truncamiento a `max_caracteres`, nombre `apuntes.resumen1.md` si ya existe, archivo no UTF-8 saltado con motivo, respuesta vacía saltada y fallo de la IA con código 4 conservando los resúmenes ya hechos. Yo probé `resumir-apuntes` con un texto de prueba: con `--simular` dijo "enviaría 220 caracteres" y no creó nada, y sin `--simular` Groq devolvió un resumen de cinco líneas guardado en `prueba.resumen.md`. Las tildes mal en PowerShell son un problema de visualización, no del archivo.
+**Commit:** Añado la acción de `resumir`, modifico `motor.py` y `cli.py` donde crea el proveedor de IA.
 

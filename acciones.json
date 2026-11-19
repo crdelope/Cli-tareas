@@ -1,28 +1,33 @@
 {
   "version": 1,
   "acciones": [
-    	{
-      		"nombre": "borrar-temporales",
-      		"descripcion": "Borra los ficheros .tmp de la carpeta indicada",
-      		"tipo": "borrar",
-      		"filtro": { "extensiones": [".tmp"], "mas_antiguo_que_dias": 30 },
-      		"confirmar": true
-    	},
-	{
-      		"nombre": "renombrar-fotos",
-      		"descripcion": "renombra archivos jpg, con la fecha de la foto",
-		"plantilla": "foto-{n:03}_{fecha:%Y-%m-%d}{ext}",
-      		"tipo": "renombrar",
-      		"filtro": { "extensiones": [".jpg", ".jpeg", ".png"]},
-      		"confirmar": true
-    	},
-	{
-      		"nombre": "mover-fotos",
-      		"descripcion": "mueve las fotos a la carpeta Fotos2026",
-		"destino": "~/pruebas-tareas/Fotos2026",
-		"tipo": "mover",
-      		"filtro": { "extensiones": [".jpg", ".jpeg", ".png"]}
-    	}
-	
+    {
+      "nombre": "borrar-temporales",
+      "descripcion": "Borra los ficheros .tmp de la carpeta indicada",
+      "tipo": "borrar",
+      "filtro": { "extensiones": [".tmp"], "mas_antiguo_que_dias": 30 },
+      "confirmar": true
+    },
+    {
+      "nombre": "renombrar-fotos",
+      "descripcion": "renombra archivos jpg, con la fecha de la foto",
+      "plantilla": "foto-{n:03}_{fecha:%Y-%m-%d}{ext}",
+      "tipo": "renombrar",
+      "filtro": { "extensiones": [".jpg", ".jpeg", ".png"] },
+      "confirmar": true
+    },
+    {
+      "nombre": "mover-fotos",
+      "descripcion": "mueve las fotos a la carpeta Fotos2026",
+      "destino": "~/pruebas-tareas/Fotos2026",
+      "tipo": "mover",
+      "filtro": { "extensiones": [".jpg", ".jpeg", ".png"] }
+    },
+    {
+      "nombre": "resumir-apuntes",
+      "descripcion": "Resume los apuntes de texto de la carpeta indicada",
+      "tipo": "resumir",
+      "instrucciones": "Resume el texto en cinco líneas, en español sencillo."
+    }
   ]
 }
