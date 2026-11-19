@@ -234,7 +234,7 @@ Texto redactado con ayuda de Claude
 **Qué hizo:** Modificó el archivo config.py para incluir dos acciones nuevas: resumir y clasificar.
 **Lo que revisé en el diff:** Que solo modificó config.py, que las ramas mover, renombrar y borrar no han sido tocadas, que los mensajes de error están en español y dicen acción y campo, que el valor por defecto 12000 no se escribe en ningún sitio. comprobamos una línea que se repetía en el diff pero era sólo cosa del visor lo comprobamos con Select-string.
 **Resultado:** Opencode ejecutó 40 pruebas en línea y pasaron todas. Todo los errores nuevos aparecen con código 3. uv run tareas listar sigue enseñando mis tres acciones. y las pruebas no se guardaron en ningún archivo: más adelante las convertiremos en pytest.
-**Commit:** Modifico el archivo config.py para incluir: resumir y clasificar.
+**Commit:** Valido en config.py las acciones resumir y clasificar.
 
 
 
