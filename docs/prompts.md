@@ -266,5 +266,39 @@ Texto redactado con ayuda de Claude
 **Qué hizo:** Modificó `motor.py`, donde añadió la acción de tipo `resumir` (lee los archivos de texto, los manda a la IA, guarda el resumen en un archivo `.resumen.md` junto al original y no pisa archivos existentes), y `cli.py`, donde crea el proveedor de IA solo cuando hace falta y añade el mensaje de simulación y el contador "Resumidos".
 **Lo que revisé en el diff:** Comprobé en `cli.py` que `ProveedorCentro()` solo se crea si la acción es `resumir` y no hay `--simular`, y que está dentro del `try`, así que un fallo de la IA sale en rojo con código 4. Comprobé que solo había cambios para `resumir` y que `mover`, `renombrar` y `borrar` no se tocaron. Además, `config.py`, `ia.py`, `errores.py` y `.env` no se modificaron. Después añadí yo la acción `resumir-apuntes` a `acciones.json`.
 **Resultado:** OpenCode hizo pruebas con un proveedor falso: simulación sin escribir nada ni llamar a la IA, truncamiento a `max_caracteres`, nombre `apuntes.resumen1.md` si ya existe, archivo no UTF-8 saltado con motivo, respuesta vacía saltada y fallo de la IA con código 4 conservando los resúmenes ya hechos. Yo probé `resumir-apuntes` con un texto de prueba: con `--simular` dijo "enviaría 220 caracteres" y no creó nada, y sin `--simular` Groq devolvió un resumen de cinco líneas guardado en `prueba.resumen.md`. Las tildes mal en PowerShell son un problema de visualización, no del archivo.
-**Commit:** Añado la acción de `resumir`, modifico `motor.py` y `cli.py` donde crea el proveedor de IA.
+**Commit:** Añado la acción de resumir que ya funciona y he añadido la acción a acciones.json, modifico motor.py y cli.py donde crea el proveedor de IA.
 
+### Prompt 9 · Pruebas con pytest (19 nov 2026)
+
+Texto redactado con ayuda de Claude
+
+**Agente:** plan (para ver el plan) y luego build
+**Prompt:**
+
+> **Qué archivos:** Crea la carpeta `tests/` con `conftest.py`, `test_config.py`, `test_motor.py` y `test_cli.py`. No modifiques ningún archivo de `src/`.
+>
+> **Qué debe hacer:** Escribe pruebas con pytest, ya instalado.
+> - `conftest.py`: un fixture automático que antes de cada prueba cambie a una carpeta temporal (`tmp_path`), apunte `HOME` y `USERPROFILE` a esa carpeta y quite las variables `CENTRO_IA_URL`, `CENTRO_IA_KEY`, `CENTRO_IA_MODELO` y `CENTRO_IA_CA`. Un `ProveedorFalso` que devuelva un texto fijo. Un fixture que escriba un `acciones.json` en la carpeta actual.
+> - `test_config.py`: acciones válidas e inválidas de cada tipo (`mover`, `renombrar`, `borrar`, `resumir`, `clasificar`), con `pytest.mark.parametrize`. Comprueba que los errores tienen código 3.
+> - `test_motor.py`: `mover`, `renombrar`, `borrar` y `resumir` con `--simular` (no cambia nada) y sin simular. En `resumir`, usa el `ProveedorFalso`, comprueba `apuntes.resumen1.md` si ya existe, que se salta un archivo no UTF-8 y que, si la IA falla, se conservan los resúmenes ya hechos y el error tiene código 4.
+> - `test_cli.py`: con `CliRunner` de Typer, comprueba los códigos de salida 0, 1, 3 y 4, y que `--help` y `listar` funcionan.
+>
+> **Reglas:**
+> - Todas las pruebas usan solo `tmp_path`. Nunca tocan `~/pruebas-tareas` ni el `acciones.json` real.
+> - Ninguna prueba usa la red.
+> - Cada prueba tiene un nombre que explique qué comprueba.
+> - Si una prueba descubre un fallo del programa, no lo arregles: dímelo.
+>
+> **Qué NO tocar:**
+> - No toques nada de `src/`, ni `acciones.json`, ni `.env`.
+> - No abras ni leas `.env`.
+> - No instales nada.
+>
+> **Pruebas:** Ejecuta `uv run pytest -v` y enséñame el resultado.
+>
+> **Antes de escribir nada, enséñame el plan.**
+
+**Qué hizo:**
+**Lo que revisé en el diff:**
+**Resultado:**
+**Commit:**
