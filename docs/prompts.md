@@ -298,7 +298,7 @@ Texto redactado con ayuda de Claude
 >
 > **Antes de escribir nada, enséñame el plan.**
 
-**Qué hizo:**
-**Lo que revisé en el diff:**
-**Resultado:**
-**Commit:**
+**Qué hizo:** Creó la carpeta `tests/` con cuatro archivos: `conftest.py` (aísla cada prueba en una carpeta temporal, quita las variables de la IA y define un `ProveedorFalso`), `test_config.py` (acciones válidas e inválidas de cada tipo, con código 3), `test_motor.py` (`mover`, `renombrar`, `borrar` y `resumir`, con y sin `--simular`) y `test_cli.py` (códigos de salida 0, 1, 3 y 4).
+**Lo que revisé en el diff:** Comprobé que solo se habían creado archivos nuevos dentro de `tests/` y que `src/`, `acciones.json` y `.env` no se tocaron. Vi que `conftest.py` cambia a `tmp_path` antes de cada prueba y anula `load_dotenv`, así que ninguna prueba toca mis carpetas reales ni usa la clave. Y que ninguna prueba usa la red.
+**Resultado:** Ejecuté `uv run pytest -v` y pasaron las 29 pruebas en menos de un segundo. Comprobé con `git status` que solo se subían `tests/` y `prompts.md`.
+**Commit:** `594fb67`Añado pruebas con pytest de config, motor y cli.
