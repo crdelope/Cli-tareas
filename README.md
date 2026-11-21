@@ -12,7 +12,7 @@ Necesitas [uv](https://docs.astral.sh/uv/) y Python 3.12.
 uv tool install git+https://github.com/crdelope/Cli-tareas@v1.0.0
 tareas --help
 ```
-Si ves la ayuda con los comandos, está bien instalado. Pendiente: la versión `v1.0.0` aún no está publicada.
+Si ves la ayuda con los comandos, está bien instalado.
 
 > **Windows:** si después de instalar el comando `tareas` no se reconoce, ejecuta `uv tool update-shell` y abre una terminal nueva.
 
